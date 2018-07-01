@@ -1,8 +1,8 @@
 import tensorflow as tf
 import numpy as np
 
-IMG_SIZE_PX = 256
-SLICE_COUNT = 256
+IMG_SIZE_PX = 16
+SLICE_COUNT = 16
 
 n_classes = 2
 batch_size = 10
@@ -28,24 +28,26 @@ def convolutional_neural_network(x):
                #       5 x 5 x 5 patches, 32 channels, 64 features to compute.
                'W_conv2': tf.Variable(tf.random_normal([3, 3, 3, 32, 64])),
                #                                  64 features
-               'W_fc': tf.Variable(tf.random_normal([16777216, 1024])),
-               'out': tf.Variable(tf.random_normal([1024, n_classes]))}
+               'W_fc': tf.Variable(tf.random_normal([4*4*64, 1000])),
+               'out': tf.Variable(tf.random_normal([1000, n_classes]))}
 
     biases = {'b_conv1': tf.Variable(tf.random_normal([32])),
               'b_conv2': tf.Variable(tf.random_normal([64])),
-              'b_fc': tf.Variable(tf.random_normal([1024])),
+              'b_fc': tf.Variable(tf.random_normal([1000])),
               'out': tf.Variable(tf.random_normal([n_classes]))}
 
-    #                            image X      image Y        image Z
+    #                            image X      image Y        image Z           reshape the image to the correct size
     x = tf.reshape(x, shape=[-1, IMG_SIZE_PX, IMG_SIZE_PX, SLICE_COUNT, 1])
 
+    # ReLU = rectified linear units (negative values become 0)
     conv1 = tf.nn.relu(conv3d(x, weights['W_conv1']) + biases['b_conv1'])
     conv1 = maxpool3d(conv1)
 
     conv2 = tf.nn.relu(conv3d(conv1, weights['W_conv2']) + biases['b_conv2'])
     conv2 = maxpool3d(conv2)
 
-    fc = tf.reshape(conv2, [-1, 16777216])
+    # final grid dimensions times the number of channel
+    fc = tf.reshape(conv2, [-1, 4 * 4 * 64])
     fc = tf.nn.relu(tf.matmul(fc, weights['W_fc'])+biases['b_fc'])
     fc = tf.nn.dropout(fc, keep_rate)
 
@@ -54,10 +56,10 @@ def convolutional_neural_network(x):
     return output
 
 
-y = tf.placeholder('float')
+def train_neural_network(train_data, validation_data):
+    x = tf.placeholder('float', [None, 256])
+    y = tf.placeholder('float', [None, 2])
 
-
-def train_neural_network(x, train_data, validation_data):
     prediction = convolutional_neural_network(x)
     cost = tf.reduce_mean(
         tf.nn.softmax_cross_entropy_with_logits_v2(logits=prediction, labels=y))
@@ -72,11 +74,11 @@ def train_neural_network(x, train_data, validation_data):
 
         for epoch in range(hm_epochs):
             epoch_loss = 0
-            for data in train_data:
+            for i in range(len(train_data.images)):
                 total_runs += 1
                 try:
-                    X = data[0]
-                    Y = data[1]
+                    X = train_data.images[i]
+                    Y = train_data.labels[i]
                     _, c = sess.run([optimizer, cost], feed_dict={x: X, y: Y})
                     epoch_loss += c
                     successful_runs += 1
@@ -93,12 +95,12 @@ def train_neural_network(x, train_data, validation_data):
             correct = tf.equal(tf.argmax(prediction, 1), tf.argmax(y, 1))
             accuracy = tf.reduce_mean(tf.cast(correct, 'float'))
 
-            print('Accuracy:', accuracy.eval(
-                {x: [i[0] for i in validation_data], y: [i[1] for i in validation_data]}))
+            # print('Accuracy:', accuracy.eval(
+            # {x: [i[0] for i in validation_data], y: [i[1] for i in validation_data]}))
 
         print('Done. Finishing accuracy:')
-        print('Accuracy:', accuracy.eval(
-            {x: [i[0] for i in validation_data], y: [i[1] for i in validation_data]}))
+        # print('Accuracy:', accuracy.eval(
+        # {x: [i[0] for i in validation_data], y: [i[1] for i in validation_data]}))
 
         print('fitment percent:', successful_runs/total_runs)
 
