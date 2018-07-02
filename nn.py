@@ -22,6 +22,12 @@ def maxpool3d(x):
     return tf.nn.max_pool3d(x, ksize=[1, 2, 2, 2, 1], strides=[1, 2, 2, 2, 1], padding='SAME')
 
 
+'''
+This functions constructs the neural network.
+@params x: placeholder
+'''
+
+
 def convolutional_neural_network(x):
     #                # 5 x 5 x 5 patches, 1 channel, 32 features to compute.
     weights = {'W_conv1': tf.Variable(tf.random_normal([3, 3, 3, 1, 32])),
@@ -54,6 +60,14 @@ def convolutional_neural_network(x):
     output = tf.matmul(fc, weights['out'])+biases['out']
 
     return output
+
+
+'''
+This is the main function. It constructs the neural network, introduces a cost function
+and trains an optimizer. 
+Consecutively the network is trained with the train_data
+@params: train_data, validation_data
+'''
 
 
 def train_neural_network(train_data, validation_data):
