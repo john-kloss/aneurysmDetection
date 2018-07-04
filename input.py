@@ -28,22 +28,24 @@ def import_voxel():
     train_labels = []
     test_images = []
     test_labels = []
-    # add 80 % of the data
-    for i in range(len(images_true)*8/10):
+
+    # add 80 % of the data to the training set
+    for i in range(int(len(images_true)*8/10)):
         train_images.append(images_true[i])
         train_labels.append(True)
 
-    for i in range(len(images_false)*8/10):
+    for i in range(int(len(images_false)*8/10)):
         train_images.append(images_false[i])
         train_labels.append(False)
 
-    for i in range(len(images_true)*8/10, len(images_true)):
-        train_images.append(images_true[i])
-        train_labels.append(True)
+    # and 20% to to the test set
+    for i in range(int(len(images_true)*8/10), len(images_true)):
+        test_images.append(images_true[i])
+        test_labels.append(True)
 
-    for i in range(len(images_false)*8/10, len(images_false)):
-        train_images.append(images_false[i])
-        train_labels.append(False)
+    for i in range(int(len(images_false)*8/10), len(images_false)):
+        test_images.append(images_false[i])
+        test_labels.append(False)
 
     # put the train data into an object
 
@@ -57,5 +59,5 @@ def import_voxel():
     # create the data object
     data = Object()
     data.train = train
-    data.test = []
+    data.test = test
     return data
