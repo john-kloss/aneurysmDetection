@@ -14,6 +14,7 @@ This function imports the voxelized data
 def import_single_voxel(fileName):
     with open(os.getcwd() + '/data/obj/' + fileName, 'rb') as voxel:
         return binvox_rw.read_as_3d_array(voxel).data
+        
 
 
 def import_voxel():
