@@ -13,4 +13,4 @@ if __name__ == "__main__":
     dicoms = input.import_dicoms()
     data = createSubvolumes.create_subvolumes(dicoms)
 
-    # nn.train_neural_network(data.train, data.test)
+    nn.train_neural_network(data['train'], data['test'])

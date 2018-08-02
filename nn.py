@@ -88,11 +88,11 @@ def train_neural_network(train_data, validation_data):
 
         for epoch in range(hm_epochs):
             epoch_loss = 0
-            for i in range(len(train_data.images)):
+            for i in range(len(train_data['images'])):
                 total_runs += 1
                 try:
-                    X = train_data.images[i]
-                    Y = train_data.labels[i]
+                    X = train_data['images'][i]
+                    Y = train_data['images'][i]
                     _, c = sess.run([optimizer, cost], feed_dict={x: X, y: Y})
                     epoch_loss += c
                     successful_runs += 1
@@ -117,6 +117,3 @@ def train_neural_network(train_data, validation_data):
         # {x: [i[0] for i in validation_data], y: [i[1] for i in validation_data]}))
 
         print('fitment percent:', successful_runs/total_runs)
-
-# Run this locally:
-# train_neural_network(x)
