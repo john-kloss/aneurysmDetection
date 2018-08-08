@@ -5,7 +5,7 @@ import os
 import progressbar
 
 SUBVOLUME_SIZE = 32
-SUBVOLUME_OVERLAP = 1
+SUBVOLUME_OVERLAP = 0.5
 
 
 def create_subvolumes(dicoms):
@@ -59,8 +59,8 @@ def create_subvolumes(dicoms):
 
     # create the data object with train and test set
     data = {
-        "train": {"images": train_images[0:100], "labels": train_labels[0:100]},
-        "test": {"images": test_images[0:100], "labels": test_labels[0:100]},
+        "train": {"images": train_images[0:1000], "labels": train_labels[0:1000]},
+        "test": {"images": test_images[0:1000], "labels": test_labels[0:1000]},
     }
     return data
 
@@ -68,34 +68,34 @@ def create_subvolumes(dicoms):
 # check if the subvolume contain the aneurysm
 
 
+def check_for_aneurysm_(x, y, z, aneurysm_coordinates):
+    for i in range(len(aneurysm_coordinates)):
+        ac = aneurysm_coordinates[i]
+        # the aneurysm has to be completely inside the subvolume
+        if (
+            (x <= ac[0] - ac[3])
+            & (x + SUBVOLUME_SIZE >= ac[0] + ac[3])
+            & (y <= ac[1] - ac[3])
+            & (y + SUBVOLUME_SIZE >= ac[1] + ac[3])
+            & (z <= ac[2] - ac[3])
+            & (z + SUBVOLUME_SIZE >= ac[2] + ac[3])
+        ):
+            return np.array([1, 0])  # true
+    return np.array([0, 1])  # false
+
+
+# not considering the size of the aneurysm might yield better results
 def check_for_aneurysm(x, y, z, aneurysm_coordinates):
     for i in range(len(aneurysm_coordinates)):
         ac = aneurysm_coordinates[i]
         # the aneurysm has to be completely inside the subvolume
         if (
-            (x < ac[0] - ac[3])
-            & (x + SUBVOLUME_SIZE > ac[0] + ac[3])
-            & (y < ac[1] - ac[3])
-            & (y + SUBVOLUME_SIZE > ac[1] + ac[3])
-            & (z < ac[2] - ac[3])
-            & (z + SUBVOLUME_SIZE > ac[2] + ac[3])
+            (x <= ac[0])
+            & (x + SUBVOLUME_SIZE >= ac[0])
+            & (y <= ac[1])
+            & (y + SUBVOLUME_SIZE >= ac[1])
+            & (z <= ac[2])
+            & (z + SUBVOLUME_SIZE >= ac[2])
         ):
-            return np.array([1, 0]) # true
-    return np.array([0, 1]) # false
-
-
-# not considering the size of the aneurysm might yield better results
-def check_for_aneurysm_new(x, y, z, aneurysm_coordinates):
-    for i in range(len(aneurysm_coordinates)):
-        ac = aneurysm_coordinates[i]
-        # the aneurysm has to be completely inside the subvolume
-        if (
-            (x < ac[0])
-            & (x + SUBVOLUME_SIZE > ac[0])
-            & (y < ac[1])
-            & (y + SUBVOLUME_SIZE > ac[1])
-            & (z < ac[2])
-            & (z + SUBVOLUME_SIZE > ac[2])
-        ):
-            return True
-    return False
+            return np.array([1, 0])  # true
+    return np.array([0, 1])  # false
