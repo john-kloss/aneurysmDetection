@@ -4,7 +4,6 @@ from __future__ import print_function
 
 # Imports
 import input
-import numpy as np
 import nn
 import createSubvolumes
 
