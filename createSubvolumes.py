@@ -1,6 +1,7 @@
+# Deprecated 
+
 import input
 import numpy as np
-import binvox_rw
 import os
 import progressbar
 
@@ -41,7 +42,7 @@ def create_subvolumes(dicoms):
                     label = check_for_aneurysm(x, y, z, dicom.aneurysm)
 
                     # add 80% of the subvolume to the training set
-                    if i < len(dicoms) * 0.6:
+                    if i < len(dicoms) * 0.8:
                         train_images.append(subvolume)
                         train_labels.append(label)
                     else:  # add the rest to the test data
@@ -59,8 +60,8 @@ def create_subvolumes(dicoms):
 
     # create the data object with train and test set
     data = {
-        "train": {"images": train_images[0:1000], "labels": train_labels[0:1000]},
-        "test": {"images": test_images[0:1000], "labels": test_labels[0:1000]},
+        "train": {"images": train_images[0:100], "labels": train_labels[0:100]},
+        "test": {"images": test_images[0:100], "labels": test_labels[0:100]},
     }
     return data
 

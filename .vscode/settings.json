@@ -1,10 +1,6 @@
 {
-<<<<<<< HEAD
-  "python.pythonPath": "/home/ulie/anaconda3/bin/python"
-=======
-  "python.pythonPath": "/usr/bin/python3",
+  "python.pythonPath": "/home/ulie/anaconda3/bin/python",
   "python.formatting.provider": "black",
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true
->>>>>>> bae9a7375181d8735a1bf2fdd275e5775a5896dd
 }
