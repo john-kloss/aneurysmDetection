@@ -1,6 +1,6 @@
 # Deprecated 
 
-import input
+import inputs
 import numpy as np
 import os
 import progressbar
