@@ -1,6 +1,20 @@
 
 import os
 import pydicom
+import augment
+
+class Dicom:
+    def __init__(self, patient, aneurysm, pixel_array):
+        self.patient = patient
+        self.aneurysm = aneurysm
+        self.pixel_array = pixel_array
+        self.mask = None
+        self.rotations = None
+        self.shears = None
+        self.scales = None
+        self.flips = None
+    
+
 
 # this object contains all voxel aneurysm positions
 # in the form of [x,y,z,size] for each aneurysm
@@ -64,8 +78,12 @@ def import_dicoms():
             # to find the patient in the dictionary
             file = file.replace(".dcm", "")
             # append the aneurysm coordinates to the dicom
-            ds.aneurysm = aneurysm_coordinates[file]
-            dicoms.append(ds)
-
+            dicom_object = Dicom(file, aneurysm_coordinates[file], ds.pixel_array)
+            
+            dicoms.append(dicom_object)
+            #augment.flip_images(dicoms)
+            #ds.PixelData = dicoms[0].flips["pixel_array"][0]
+            #ds.save_as(os.getcwd() + "/data/test2.dcm")
+    
     print("Import done.")
     return dicoms
