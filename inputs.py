@@ -84,10 +84,6 @@ def import_dicoms():
             #augment.flip_images(dicoms)
             #ds.PixelData = dicoms[0].flips["pixel_array"][0]
             #ds.save_as(os.getcwd() + "/data/test2.dcm")
-
-            augment.create_masks(dicoms)
-            ds.PixelData = dicoms[0].mask
-            ds.save_as(os.getcwd() + "/data/test2.dcm")
     
     print("Import done.")
     return dicoms

@@ -2,7 +2,6 @@ from scipy.ndimage import rotate
 import pydicom
 import numpy as np
 import inputs
-import scipy.stats as stats
 import pymrt as mrt
 import pymrt.geometry
 import transforms3d as trans
@@ -41,7 +40,7 @@ def create_masks(dicoms):
                     for z in range(shape):
                         # set all voxels containing aneurysm to 1 
                         if aneurysm_sphere[x][y][z]:
-                            mask[ac[0] - size + x][ac[1] - size + y][ac[2] - size + z] = 255
+                            mask[ac[0] - size + x][ac[1] - size + y][ac[2] - size + z] = 1
 
         dicom.mask = mask
 
@@ -122,7 +121,7 @@ def flip_images(dicoms):
             n = [0,0,-1]
             A = trans.reflections.rfnorm2aff(n,p)
             pixel_array.append(affine_transform(dicom.pixel_array,A))
-            #mask.append(affine_transform(dicom.mask,A))
+            mask.append(affine_transform(dicom.mask,A))
         
         flipped_data = {
             "pixel_array" : pixel_array,
