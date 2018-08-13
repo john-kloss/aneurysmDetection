@@ -1,12 +1,11 @@
 import input
 import numpy as np
-import binvox_rw
 import os
 import progressbar
+import math 
 
 SUBVOLUME_SIZE = 32
-SUBVOLUME_OVERLAP = 0.5
-
+SUBVOLUME_OVERLAP = 0.2
 
 def create_subvolumes(dicoms):
 
@@ -24,7 +23,7 @@ def create_subvolumes(dicoms):
         dicom = dicoms[i]
         dim = dicom.pixel_array.shape
         # calculate the stepsize
-        stepsize = int(SUBVOLUME_SIZE * SUBVOLUME_OVERLAP)
+        stepsize = math.floor(SUBVOLUME_SIZE * SUBVOLUME_OVERLAP)
 
         # iterate over all dimension
         for x in range(0, dim[0] - SUBVOLUME_SIZE + 1, stepsize):
@@ -40,8 +39,8 @@ def create_subvolumes(dicoms):
                     # check if the subvolume contains an aneurysm
                     label = check_for_aneurysm(x, y, z, dicom.aneurysm)
 
-                    # add 80% of the subvolume to the training set
-                    if i < len(dicoms) * 0.6:
+                    # add 80% of the patient data to the training set
+                    if i < 1: # len(dicoms) * 0.6:
                         train_images.append(subvolume)
                         train_labels.append(label)
                     else:  # add the rest to the test data
@@ -59,8 +58,8 @@ def create_subvolumes(dicoms):
 
     # create the data object with train and test set
     data = {
-        "train": {"images": train_images[0:1000], "labels": train_labels[0:1000]},
-        "test": {"images": test_images[0:1000], "labels": test_labels[0:1000]},
+        "train": {"images": train_images[5000:10000], "labels": train_labels[5000:10000]},
+        "test": {"images": test_images[5000:10000], "labels": test_labels[5000:10000]},
     }
     return data
 
@@ -88,7 +87,7 @@ def check_for_aneurysm_(x, y, z, aneurysm_coordinates):
 def check_for_aneurysm(x, y, z, aneurysm_coordinates):
     for i in range(len(aneurysm_coordinates)):
         ac = aneurysm_coordinates[i]
-        # the aneurysm has to be completely inside the subvolume
+        # the origin of the aneurysm has to be inside the subvolume
         if (
             (x <= ac[0])
             & (x + SUBVOLUME_SIZE >= ac[0])

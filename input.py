@@ -1,4 +1,3 @@
-import binvox_rw
 import os
 import pydicom
 

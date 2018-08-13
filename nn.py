@@ -2,19 +2,17 @@ import tensorflow as tf
 import numpy as np
 import os
 import progressbar
+import logging
 
 IMG_SIZE_PX = 32
 
 n_classes = 2
 batch_size = 10
 
-
 keep_rate = 0.8
-
 
 def conv3d(x, W):
     return tf.nn.conv3d(x, W, strides=[1, 1, 1, 1, 1], padding="SAME")
-
 
 def maxpool3d(x):
     #                        size of window         movement of window as you slide about
@@ -77,6 +75,10 @@ Consecutively the network is trained with the train_data
 
 
 def train_neural_network(train_data, validation_data, name="train"):
+    tf.reset_default_graph()
+    saved_graph = tf.train.import_meta_graph(os.getcwd()+'/data/tmp/log/sess-36000.meta')
+
+
     with tf.name_scope(name):
         x = tf.placeholder("float", [None, 32, 32, 32], name="x")
         y = tf.placeholder("float", [None, 2], name="y")
@@ -88,7 +90,11 @@ def train_neural_network(train_data, validation_data, name="train"):
         optimizer = tf.train.AdamOptimizer(learning_rate=1e-3).minimize(cost)
 
         hm_epochs = 10
-        with tf.Session() as sess:
+        #saved_graph= tf.train.Saver()
+        with tf.Session(config=tf.ConfigProto(log_device_placement=True)) as sess:
+           
+            saved_graph.restore(sess, tf.train.latest_checkpoint(os.getcwd()+'/data/tmp/log'))
+
             writer = tf.summary.FileWriter(os.getcwd() + "/tmp/log")
             writer.add_graph(sess.graph)
             sess.run(tf.global_variables_initializer())
@@ -97,13 +103,31 @@ def train_neural_network(train_data, validation_data, name="train"):
             total_runs = 0
 
             for epoch in range(hm_epochs):
+                 # initialize the progress bar
+                progressbar.printProgressBar(
+                    0, len(train_data["images"]), prefix="Training network:", suffix="Complete", length=50
+                )
+             
                 epoch_loss = 0
                 for i in range(len(train_data["images"])):
+                    # print the progress
+                    progressbar.printProgressBar(
+                        i+1,
+                        len(train_data["images"]),
+                        prefix="Training network:",
+                        suffix="Complete",
+                        length=50,
+                    )
                     total_runs += 1
                     try:
                         X = train_data["images"][i].reshape(1, 32, 32, 32)
                         Y = train_data["labels"][i].reshape(1, 2)
                         _, c = sess.run([optimizer, cost], feed_dict={x: X, y: Y})
+                        
+                        if (i*epoch) % 1000 == 0:
+                            saved_graph.save(sess, os.getcwd()+'/data/tmp/log/sess', global_step=i*epoch)
+
+
                         epoch_loss += c
                         successful_runs += 1
                     except Exception as e:
@@ -132,7 +156,9 @@ def train_neural_network(train_data, validation_data, name="train"):
                             }
                         )
                     )
-                print(ev)
+                print(np.mean(ev))
+                logging.basicConfig(filename='example.log',level=logging.DEBUG)
+                logging.debug("Epoch " + str(epoch)+ "  accuracy:  " + str(np.mean(ev)))
 
                 # print('Accuracy:', accuracy.eval(
                 # {x: [i[0] for i in validation_data], y: [i[1] for i in validation_data]}))
