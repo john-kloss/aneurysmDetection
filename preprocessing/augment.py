@@ -63,10 +63,10 @@ def rotate_images(dicom, num):
     params = []
 
     for n in range(num):
-        param = (np.random.randint(1,30))
+        param = (np.random.randint(-15,15))
         rotation = rotate(dicom.pixel_array, axes=(2,1), angle=param, reshape=False)
         
-        pixel_array.append(rotation)
+        pixel_array.append(normalize_grayscale(rotation))
         mask.append(rotate(dicom.mask, axes=(0,1), angle=param, reshape=False))
         params.append(param)
 
@@ -86,13 +86,12 @@ def shear_images(dicom, num):
     params = []
     for shears in range(num):
         # only transform x axis?
-        # param = random.uniform(0.5, 3.5)
-        param = 2
+        param = random.uniform(0, 0.05)
         S = [param, 0, 0]
         shear = affine_transform(dicom.pixel_array,trans.shears.striu2mat(S))
         
-        pixel_array.append(shear)
-        #mask.append(affine_transform(dicom.mask,trans.shears.striu2mat(S)))
+        pixel_array.append(normalize_grayscale(shear))
+        mask.append(affine_transform(dicom.mask,trans.shears.striu2mat(S)))
         params.append(param)
 
     sheared_data = {
@@ -112,13 +111,12 @@ def scale_images(dicom, num):
     mask = []
     params = []
     for scales in range(num):
-        #param = random.uniform(0.5,2)
-        param = 1.5
+        param = random.uniform(0.95,1.05)
         S = trans.zooms.zfdir2mat(param)
         scaling = affine_transform(dicom,S)
         
-        pixel_array.append(scaling)
-        #mask.append(affine_transform(dicom.mask,S))
+        pixel_array.append(normalize_grayscale(scaling)
+        mask.append(affine_transform(dicom.mask,S))
         params.append(param)
     
     scaled_data = {
@@ -127,13 +125,13 @@ def scale_images(dicom, num):
         "params" : params
     }
 
-    #dicom.scales = scaled_data
+    dicom.scales = scaled_data
     
-    return scaling
+    return dicom
 
 
 def flip_images(dicom, num):
-
+    # performs vertical flip, but not fully checked, might not work
     pixel_array = []
     mask = []
     params = []
@@ -159,15 +157,8 @@ def flip_images(dicom, num):
     return dicom
 
 
-def augmentation(dicoms):
+def augmentation_wrapper(dicoms):
     # combination of 9 augmentations
-    augment_types= random.choices(["shear_images", "rotate_images", "scale_images"], k=9)
-    counts = Counter(augment_types)
 
-    #
     # for augmentation in dicoms:
 
-    #dicoms = create_masks(dicoms)
-    #dicoms = shear_images(dicoms)
-    #dicoms = rotate_images(dicoms)
-    #dicoms = scale_images(dicoms)
