@@ -1,7 +1,7 @@
 
 import os
 import pydicom
-import augment
+import preprocessing.augment
 
 class Dicom:
     def __init__(self, patient, aneurysm, pixel_array):
@@ -81,9 +81,11 @@ def import_dicoms():
             dicom_object = Dicom(file, aneurysm_coordinates[file], ds.pixel_array)
             
             dicoms.append(dicom_object)
-            #augment.flip_images(dicoms)
-            #ds.PixelData = dicoms[0].flips["pixel_array"][0]
-            #ds.save_as(os.getcwd() + "/data/test2.dcm")
+            preprocessing.augment.shear_images(dicoms[0],1)
+            dat = preprocessing.augment.scale_images(dicoms[0].shears["pixel_array"][0],1)
+            ds.PixelData = dat
+            #ds.PixelData = dicoms[0].scales["pixel_array"][0]
+            ds.save_as(os.getcwd() + "/data/shear_scale.dcm")
     
     print("Import done.")
     return dicoms
