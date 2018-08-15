@@ -7,9 +7,8 @@ import pymrt.geometry
 import transforms3d as trans
 from scipy.ndimage import affine_transform
 import random
+import progressbar
 import matplotlib.pyplot as plt
-from collections import Counter
-
 
 
 def normalize_grayscale(pixel_array):
@@ -57,108 +56,105 @@ def create_masks(dicoms):
 
 
 
-def rotate_images(dicom, num):
-    pixel_array = []
-    mask = []
-    params = []
+def rotate_images(pixel_array, mask):
 
-    for n in range(num):
-        param = (np.random.randint(-15,15))
-        rotation = rotate(dicom.pixel_array, axes=(2,1), angle=param, reshape=False)
-        
-        pixel_array.append(normalize_grayscale(rotation))
-        mask.append(rotate(dicom.mask, axes=(0,1), angle=param, reshape=False))
-        params.append(param)
+    param = (np.random.randint(-15,15))
+    pixel_array = rotate(pixel_array, axes=(2,1), angle=param, reshape=False) 
+    mask = rotate(mask, axes=(0,1), angle=param, reshape=False)
 
     rotated_data = {
         "pixel_array" : pixel_array,
         "mask" : mask, 
-        "params" : params
+        "params" : param
     }
-
-    dicom.rotations = rotated_data
     
-    return dicom
+    return rotated_data
 
-def shear_images(dicom, num):
-    pixel_array = []
-    mask = []
-    params = []
-    for shears in range(num):
-        # only transform x axis?
-        param = random.uniform(0, 0.05)
-        S = [param, 0, 0]
-        shear = affine_transform(dicom.pixel_array,trans.shears.striu2mat(S))
-        
-        pixel_array.append(normalize_grayscale(shear))
-        mask.append(affine_transform(dicom.mask,trans.shears.striu2mat(S)))
-        params.append(param)
+def shear_images(pixel_array, mask):
+    # only transform x axis?
+    param = random.uniform(0, 0.05)
+    S = [param, 0, 0]
+
+    pixel_array = affine_transform(pixel_array,trans.shears.striu2mat(S))
+    mask = affine_transform(mask,trans.shears.striu2mat(S))
 
     sheared_data = {
         "pixel_array" : pixel_array,
         "mask" : mask, 
-        "params" : params
-
+        "params" : param
     }
-
-    dicom.shears = sheared_data
     
-    return dicom
+    return sheared_data
 
-def scale_images(dicom, num):
-    
-    pixel_array = []
-    mask = []
-    params = []
-    for scales in range(num):
-        param = random.uniform(0.95,1.05)
-        S = trans.zooms.zfdir2mat(param)
-        scaling = affine_transform(dicom,S)
-        
-        pixel_array.append(normalize_grayscale(scaling)
-        mask.append(affine_transform(dicom.mask,S))
-        params.append(param)
+def scale_images(pixel_array, mask):
+
+    param = random.uniform(0.95,1.05)
+    S = trans.zooms.zfdir2mat(param)
+    pixel_array = affine_transform(pixel_array,S)
+    mask = affine_transform(mask,S)
     
     scaled_data = {
         "pixel_array" : pixel_array,
         "mask" : mask, 
-        "params" : params
+        "params" : param
     }
-
-    dicom.scales = scaled_data
     
-    return dicom
+    return scaled_data
 
 
-def flip_images(dicom, num):
-    # performs vertical flip, but not fully checked, might not work
-    pixel_array = []
-    mask = []
-    params = []
+def flip_images(pixel_array, mask):
+    # performs vertical flip, but not checked whether it fully works yet
 
-    x,y,z = dicom.pixel_array.shape
-    for flips in range(num):
-        p = [int(x/2),int(y/2),int(z/2)]
-        n = [0,0,-1]
-        A = trans.reflections.rfnorm2aff(n,p)
-        flip = affine_transform(dicom.pixel_array,A)
-
-        pixel_array.append(normalize_grayscale(flip))
-        mask.append(affine_transform(dicom.mask,A))
+    x,y,z = pixel_array.shape
+    
+    p = [int(x/2),int(y/2),int(z/2)]
+    n = [0,0,-1]
+    A = trans.reflections.rfnorm2aff(n,p)
+    pixel_array = affine_transform(pixel_array,A)
+    mask = affine_transform(mask,A)
     
     flipped_data = {
         "pixel_array" : pixel_array,
-        "mask" : mask, 
-        "params" : params
+        "mask" : mask
     }
 
-    dicom.flips = flipped_data
+    return flipped_data
+
+
+def augmentation(dicoms, num=9):
+     # initialize the progress bar
+    progressbar.printProgressBar(
+        0, len(dicoms), prefix="Creating Augmentations:", suffix="Complete", length=50
+    )
+
+    for i in range(len(dicoms)):
+        dicom = dicoms[i]
+
+        pixel_array = []
+        mask = []
+        params = []
+        
+        for n in range(num):
+            rotated = rotate_images(dicom.pixel_array, dicom.mask)
+            scaled = scale_images(rotated["pixel_array"], np.rint(rotated["mask"]))
+            sheared = shear_images(scaled["pixel_array"], np.rint(scaled["mask"]))
+            p = [rotated["params"], scaled["params"], sheared["params"]]
+            pixel_array.append(normalize_grayscale(sheared["pixel_array"]))
+            mask.append(np.rint(sheared["mask"]))
+            params.append(p)
+
+        
+        # print the progress
+        progressbar.printProgressBar(i + 1, len(dicoms), prefix="Creating Augmentations", suffix="Complete", length=50,)
+
+        augmentations = {
+            "pixel_array" : pixel_array,
+            "mask" : mask, 
+            "params" : p,
+            "amount" : num
+        }
+
+        dicom.augmentations = augmentations
     
-    return dicom
-
-
-def augmentation_wrapper(dicoms):
-    # combination of 9 augmentations
-
-    # for augmentation in dicoms:
+    return dicoms
 

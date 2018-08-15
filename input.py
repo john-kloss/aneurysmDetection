@@ -9,10 +9,7 @@ class Dicom:
         self.aneurysm = aneurysm
         self.pixel_array = pixel_array
         self.mask = None
-        self.rotations = None
-        self.shears = None
-        self.scales = None
-        self.flips = None
+        self.augmentations = None
     
 
 
@@ -81,11 +78,9 @@ def import_dicoms():
             dicom_object = Dicom(file, aneurysm_coordinates[file], ds.pixel_array)
             
             dicoms.append(dicom_object)
-            preprocessing.augment.shear_images(dicoms[0],1)
-            dat = preprocessing.augment.scale_images(dicoms[0].shears["pixel_array"][0],1)
-            ds.PixelData = dat
-            #ds.PixelData = dicoms[0].scales["pixel_array"][0]
-            ds.save_as(os.getcwd() + "/data/shear_scale.dcm")
+            #preprocessing.augment.shear_images(dicoms[0],1)
+            #ds.PixelData = dicoms[0].shears["pixel_array"][0]
+            #ds.save_as(os.getcwd() + "/data/shear.dcm")
     
     print("Import done.")
     return dicoms
