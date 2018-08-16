@@ -1,4 +1,4 @@
-import inputs
+import input
 import numpy as np
 import os
 import progressbar
@@ -7,8 +7,14 @@ import augment
 import scipy.stats as stats
 
 
+<<<<<<< HEAD:createSubvolumes.py
 SUBVOLUME_AMOUNT=5000
 SUBVOLUME_SIZE = 32
+=======
+SUBVOLUME_AMOUNT = 10
+SUBVOLUME_SIZE = 64
+ANEURYSM_COVERAGE = 0.95
+>>>>>>> 735e2de62ccaa9c270f25835c44fb1dcd618ccbd:preprocessing/createSubvolumes.py
 
 def create_subvolumes(dicoms):
 
@@ -30,14 +36,14 @@ def create_subvolumes(dicoms):
         dim = dicom.pixel_array.shape
 
         sv = int(SUBVOLUME_SIZE/2)
-        for num_aneurysm in range(len(dicom.aneurysm)):
-            for n in range(SUBVOLUME_AMOUNT):                
+        for n in range(SUBVOLUME_AMOUNT): 
+            for num_aneurysm in range(len(dicom.aneurysm)):               
                 # draw random numbers from normal distribution for each dimension around aneurysm coordinate
                 sig = 40
                 sv_centroid = [
                     int (stats.truncnorm.rvs( 
                         a = (sv - dicom.aneurysm[num_aneurysm][coords]) / sig , 
-                        b = (dim[coords]-sv -  dicom.aneurysm[num_aneurysm][coords]) / sig, 
+                        b = ( (dim[coords]-sv ) -  dicom.aneurysm[num_aneurysm][coords]) / sig, 
                         loc = dicom.aneurysm[num_aneurysm][coords], 
                         scale = sig) ) 
                         
@@ -56,7 +62,12 @@ def create_subvolumes(dicoms):
                     (sv_centroid[2] - sv) : (sv_centroid[2] + sv)
                 ]
 
-                label_true_false = [0,1] if ((label >0).sum()) == 0 else [1,0]
+                # assign label to subvolume if aneurysm is covered to a percentage 
+                aneurysm_fraction = dicom.aneurysm[num_aneurysm][3]/sum( i[3] for i in dicom.aneurysm)
+                expected_coverage = len(dicom.mask.nonzero()[0]) * ANEURYSM_COVERAGE * aneurysm_fraction 
+
+                # [1,0] true [0,1] false
+                label_true_false = np.array([0,1]) if (len(label.nonzero()[0]) <= expected_coverage) else np.array([1,0])
 
 
                 # add 80% of the patients to the training set
@@ -81,9 +92,9 @@ def create_subvolumes(dicoms):
 
     # create the data object with train and test set
     data = {
-        "train": {"images": train_images[0:100], "labels": train_labels[0:100]},
-        "val" : {"images": val_images[0:100], "labels": val_labels[0:100]},
-        "test": {"images": test_images[0:100], "labels": test_labels[0:100]}
+        "train": {"images": train_images[0:1000], "labels": train_labels[0:1000]},
+        "val" : {"images": val_images[0:1000], "labels": val_labels[0:1000]},
+        "test": {"images": test_images[0:1000], "labels": test_labels[0:1000]}
     }
     return data
 
