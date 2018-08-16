@@ -1,16 +1,25 @@
 
 # Imports
-import input
 import nn
+import inputs
 import createSubvolumes
-import tensorflow as tf
+import augment
+from scipy.ndimage import rotate
+import os
+
 
 if __name__ == "__main__":
-    with tf.device('/gpu:0'):
 
-        #import the dicoms
-        dicoms = input.import_dicoms()
+        # import the dicoms
+        dicoms = inputs.import_dicoms()  
+        augment.create_masks(dicoms)
         data = createSubvolumes.create_subvolumes(dicoms)
+        # execute augmentation
+        augment.shear_images(dicoms)
+        augment.rotate_images(dicoms)
+        augment.scale_images(dicoms)
+        #augment.flip_images(dicoms)
+        
+        augment.normalize_grayscale(dicoms)
 
-        nn.train_neural_network(data['train'], data['test'])
-
+        nn.train_neural_network(data['train'], data['val'])
