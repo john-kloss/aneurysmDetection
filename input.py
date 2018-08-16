@@ -57,6 +57,7 @@ aneurysm_coordinates = {
     # transformed images
     "Patient_C38_MRA": [[51, 98, 212, 6.4]],
     "Patient_C42_MRA": [[]],
+    "Patient_C46_MRA": [[]],
     "Patient_C55_MRA": [[]],
     "Patient_C69_MRA": [[]],
     "Patient_C87_CE-MRA": [[97, 168, 248, 5.4]],
