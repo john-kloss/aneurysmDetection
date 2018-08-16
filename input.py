@@ -1,7 +1,7 @@
 
 import os
-import pydicom
 import preprocessing.augment
+import pydicom
 
 class Dicom:
     def __init__(self, patient, aneurysm, pixel_array):

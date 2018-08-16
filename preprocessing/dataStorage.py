@@ -23,12 +23,12 @@ def write_to_hdf5(data):
 
 
     # train data 
-    t_labels.create_dataset("train_labels", data=train_labels)
-    t_images.create_dataset("train_images", data=train_images)
+    dst_l = t_labels.create_dataset("train_labels", data=train_labels)
+    dst_i = t_images.create_dataset("train_images", data=train_images)
 
     # validation data
-    labels.create_dataset("val_labels", data=val_labels)       
-    images.create_dataset("val_images", data=val_images)
+    dsv_l = labels.create_dataset("val_labels", data=val_labels)       
+    dsv_i = images.create_dataset("val_images", data=val_images)
 
     data.close()
 
