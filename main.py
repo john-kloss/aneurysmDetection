@@ -6,23 +6,40 @@ from __future__ import print_function
 import nn
 import input
 from preprocessing.createSubvolumes import create_subvolumes
-from preprocessing.augment import augmentation, create_masks, normalize_grayscale_originals
-from preprocessing.dataStorage import write_to_hdf5
+from preprocessing.augment import augmentation, create_masks, normalize_grayscale
+from preprocessing.dataStorage import init_storage, write_dicoms
 from scipy.ndimage import rotate
 import os
-import numpy as npS
-
+import h5py
+import numpy as np
+import progressbar
 
 
 if __name__ == "__main__":
     # import the dicoms
-    dicoms = input.import_dicoms()  
-    
-    
-    dicoms = create_masks(dicoms)
-    dicoms = augmentation(dicoms,2)
-    dicoms = normalize_grayscale_originals(dicoms)
-    
-    data = create_subvolumes(dicoms)
-    write_to_hdf5(data)
+    count = 0
+    labs = None
+    imgs = None
+    hffile = None
+
+    for file in os.listdir(os.getcwd() + "/data"):
+        if ".dcm" in file:
+            dicom = input.import_dicom(file)
+            print("Processing Patient "+ str(count+1))
+
+            dicom = create_masks(dicom)
+            dicom = augmentation(dicom)
+            
+            dicom.pixel_array = normalize_grayscale(dicom.pixel_array)
+            dicom = create_subvolumes(dicom)
+            
+            if count % 2 == 0:
+                labs, imgs, hffile = init_storage(dicom,count)
+            else:
+                write_dicoms(dicom, labs, imgs, hffile)
+
+            count += 1 
+        
+        
+
 #    nn.training.train_neural_network(data['train'], data['val'])

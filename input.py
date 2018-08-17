@@ -22,13 +22,13 @@ aneurysm_coordinates = {
     "Patient_15_MRA": [[265, 65, 218, 16.2]],
     "Patient_16_MRA": [[273, 42, 176, 6.4], [259, 45, 272, 5.5]],
     "Patient_C121_CE-MRA": [],
-    "Patient_21_TOF-MRA": [64, 143, 159, 18.5],
-    "Patient_105_MRA": [211, 93, 239, 24],
-    "Patient_C37_MRA": [142, 132, 183, 10.8],
-    "Patient_C01_MRA": [96, 185, 228, 23.8],
-    "Patient_C02_MRA": [38, 178, 175, 15.5],
-    "Patient_C74_CE-MRA": [74, 208, 340, 3.5],
-    "Patient_C59_TOF-MRA": [150, 169, 187, 6.9],
+    "Patient_21_TOF-MRA": [[64, 143, 159, 18.5]],
+    "Patient_105_MRA": [[211, 93, 239, 24]],
+    "Patient_C37_MRA": [[142, 132, 183, 10.8]],
+    "Patient_C01_MRA": [[96, 185, 228, 23.8]],
+    "Patient_C02_MRA": [[38, 178, 175, 15.5]],
+    "Patient_C74_CE-MRA": [[74, 208, 340, 3.5]],
+    "Patient_C59_TOF-MRA": [[150, 169, 187, 6.9]],
     "Patient_C68_TOF-MRA": [
         [36, 151, 149, 7],
         [34, 141, 183, 5.7],
@@ -36,7 +36,7 @@ aneurysm_coordinates = {
     ],
     "Patient_C82_TOF-MRA": [[61, 129, 195, 5.3], [88, 147, 281, 3.8]],
     "Patient_C86_TOF-MRA": [[54, 182, 132, 24.7], [56, 167, 184, 5.1]],
-    "Patient_C87_TOF-MRA": [56, 154, 258, 5.1],
+    "Patient_C87_TOF-MRA": [[56, 154, 258, 5.1]],
     "Patient_C92_TOF-MRA": [[64, 176, 152, 5.2], [64, 195, 143, 6.5]],
     "Patient_C101_TOF-MRA": [[103, 157, 118, 5.8], [101, 147, 170, 4.3]],
     "Patient_C101_CE-MRA_new": [[191, 36, 121, 4.3], [191, 45, 78, 5.8]],
@@ -67,21 +67,12 @@ aneurysm_coordinates = {
 }
 
 
-def import_dicoms():
-    dicoms = []
+def import_dicom(file):
+    ds = pydicom.dcmread(os.getcwd() + "/data/" + file)
+    # to find the patient in the dictionary
+    file = file.replace(".dcm", "")     
+    #preprocessing.augment.shear_images(dicoms[0],1)
+    #ds.PixelData = dicoms[0].shears["pixel_array"][0]
+    #ds.save_as(os.getcwd() + "/data/shear.dcm")
 
-    for file in os.listdir(os.getcwd() + "/data"):
-        if ".dcm" in file:
-            ds = pydicom.dcmread(os.getcwd() + "/data/" + file)
-            # to find the patient in the dictionary
-            file = file.replace(".dcm", "")
-            # append the aneurysm coordinates to the dicom
-            dicom_object = Dicom(file, aneurysm_coordinates[file], ds.pixel_array)
-            
-            dicoms.append(dicom_object)
-            #preprocessing.augment.shear_images(dicoms[0],1)
-            #ds.PixelData = dicoms[0].shears["pixel_array"][0]
-            #ds.save_as(os.getcwd() + "/data/shear.dcm")
-    
-    print("Import done.")
-    return dicoms
+    return Dicom(file, aneurysm_coordinates[file], ds.pixel_array)

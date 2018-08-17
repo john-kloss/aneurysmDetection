@@ -1,7 +1,6 @@
 from scipy.ndimage import rotate
 import pydicom
 import numpy as np
-import input
 import pymrt as mrt
 import pymrt.geometry
 import transforms3d as trans
@@ -19,39 +18,28 @@ def normalize_grayscale(pixel_array):
     return normalized_array
 
 
-def normalize_grayscale_originals(dicoms):
-    for dicom in dicoms:
-        min = np.min(dicom.pixel_array)
-        max = np.max(dicom.pixel_array)
-        dicom.pixel_array = (dicom.pixel_array - min) / (max - min)
+def create_masks(dicom):
+
+        # generate mask
+    mask = np.zeros((dicom.pixel_array.shape))
+
+    for ac in dicom.aneurysm: 
+        # make shape of sphere array odd so centroid is exactly one voxel
+        size = int(ac[3])  # size equals radius b/c size given in mm, one voxel appr. 0,5 mm 
+        shape = size*2+1 if size%2==0 else size*2
+        aneurysm_sphere = mrt.geometry.sphere(shape,size)
+
+        # create mask by laying aneurysm sphere over dicom pixelarray 
+        for x in range(shape):
+            for y in range(shape):
+                for z in range(shape):
+                    # set all voxels containing aneurysm to 1 
+                    if aneurysm_sphere[x][y][z]:
+                        mask[ac[0] - size + x][ac[1] - size + y][ac[2] - size + z] = 1
+
+    dicom.mask = mask
     
-    return dicoms
-
-def create_masks(dicoms):
-        # iterate over all dicoms
-    for i in range(len(dicoms)):
-        dicom = dicoms[i]
-
-         # generate mask
-        mask = np.zeros((dicom.pixel_array.shape))
-
-        for ac in dicom.aneurysm: 
-            # make shape of sphere array odd so centroid is exactly one voxel
-            size = int(ac[3])  # size equals radius b/c size given in mm, one voxel appr. 0,5 mm 
-            shape = size*2+1 if size%2==0 else size*2
-            aneurysm_sphere = mrt.geometry.sphere(shape,size)
-
-            # create mask by laying aneurysm sphere over dicom pixelarray 
-            for x in range(shape):
-                for y in range(shape):
-                    for z in range(shape):
-                        # set all voxels containing aneurysm to 1 
-                        if aneurysm_sphere[x][y][z]:
-                            mask[ac[0] - size + x][ac[1] - size + y][ac[2] - size + z] = 1
-
-        dicom.mask = mask
-    
-    return dicoms
+    return dicom
 
 
 
@@ -121,40 +109,30 @@ def flip_images(pixel_array, mask):
     return flipped_data
 
 
-def augmentation(dicoms, num=9):
-     # initialize the progress bar
-    progressbar.printProgressBar(
-        0, len(dicoms), prefix="Creating Augmentations:", suffix="Complete", length=50
-    )
+def augmentation(dicom, num=9):
 
-    for i in range(len(dicoms)):
-        dicom = dicoms[i]
 
-        pixel_array = []
-        mask = []
-        params = []
+    pixel_array = []
+    mask = []
+    progressbar.printProgressBar(0, num, prefix="Creating Augmentations:", suffix="Complete", length=50)
+    for n in range(num):
+        tmp = rotate_images(dicom.pixel_array, dicom.mask)
+        tmp = scale_images(tmp["pixel_array"], np.rint(tmp["mask"]))
+        tmp = shear_images(tmp["pixel_array"], np.rint(tmp["mask"]))
+        #p = [rotated["params"], scaled["params"], sheared["params"]]
+        pixel_array.append(normalize_grayscale(tmp["pixel_array"]))
+        mask.append(np.rint(tmp["mask"]))
         
-        for n in range(num):
-            rotated = rotate_images(dicom.pixel_array, dicom.mask)
-            scaled = scale_images(rotated["pixel_array"], np.rint(rotated["mask"]))
-            sheared = shear_images(scaled["pixel_array"], np.rint(scaled["mask"]))
-            p = [rotated["params"], scaled["params"], sheared["params"]]
-            pixel_array.append(normalize_grayscale(sheared["pixel_array"]))
-            mask.append(np.rint(sheared["mask"]))
-            params.append(p)
-
-        
-        # print the progress
-        progressbar.printProgressBar(i + 1, len(dicoms), prefix="Creating Augmentations", suffix="Complete", length=50,)
-
-        augmentations = {
-            "pixel_array" : pixel_array,
-            "mask" : mask, 
-            "params" : p,
-            "amount" : num
-        }
-
-        dicom.augmentations = augmentations
+        progressbar.printProgressBar(n+1, num, prefix="Creating Augmentations", suffix="Complete", length=50,)
     
-    return dicoms
+
+    augmentations = {
+        "pixel_array" : pixel_array,
+        "mask" : mask, 
+        "amount" : num
+    }
+
+    dicom.augmentations = augmentations
+    
+    return dicom
 
