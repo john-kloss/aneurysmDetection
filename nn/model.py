@@ -4,7 +4,7 @@ from keras.engine import Input, Model
 from keras.layers import Conv3D, MaxPooling3D, UpSampling3D, Activation, BatchNormalization, PReLU, Deconvolution3D
 from keras.optimizers import Adam
 
-#from unet3d.metrics import dice_coefficient_loss, get_label_dice_coefficient_function, dice_coefficient
+from .metrics import dice_coefficient_loss, dice_coefficient
 
 K.set_image_data_format("channels_first")
 
@@ -13,15 +13,10 @@ try:
 except ImportError:
     from keras.layers.merge import concatenate
 
-def dice_coefficient(y_true, y_pred, smooth=1.):
-    y_true_f = K.flatten(y_true)
-    y_pred_f = K.flatten(y_pred)
-    intersection = K.sum(y_true_f * y_pred_f)
-    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
 
 
 def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=1, initial_learning_rate=0.00001, deconvolution=False,
-                  depth=4, n_base_filters=32, include_label_wise_dice_coefficients=False, metrics=dice_coefficient,
+                  depth=6, n_base_filters=32, include_label_wise_dice_coefficients=False, metrics=dice_coefficient,
                   batch_normalization=False, activation_name="sigmoid"):
     """
     Builds the 3D UNet Keras model.f
@@ -75,7 +70,7 @@ def unet_model_3d(input_shape, pool_size=(2, 2, 2), n_labels=1, initial_learning
     model = Model(inputs=inputs, outputs=act)
 
 
-    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=dice_coefficient_loss, metrics=metrics)
+    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=dice_coefficient_loss, metrics=[metrics])
     return model
 
 
@@ -128,11 +123,3 @@ def get_up_convolution(n_filters, pool_size, kernel_size=(2, 2, 2), strides=(2, 
                                strides=strides)
     else:
         return UpSampling3D(size=pool_size)
-
-def dice_coefficient_loss(y_true, y_pred):
-    return -dice_coefficient(y_true, y_pred)
-
-
-net = unet_model_3d((1,64,64,64))
-
-

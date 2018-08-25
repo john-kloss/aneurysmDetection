@@ -20,9 +20,9 @@ def normalize_grayscale(pixel_array):
 
 def create_masks(dicom):
 
-        # generate mask
+        # generate mask 
     mask = np.zeros((dicom.pixel_array.shape))
-
+    
     for ac in dicom.aneurysm: 
         # make shape of sphere array odd so centroid is exactly one voxel
         size = int(ac[3])  # size equals radius b/c size given in mm, one voxel appr. 0,5 mm 

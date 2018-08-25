@@ -69,8 +69,8 @@ aneurysm_coordinates = {
 
 def import_dicom(file):
     ds = pydicom.dcmread(os.getcwd() + "/data/" + file)
-    # to find the patient in the dictionary
     file = file.replace(".dcm", "")     
+    
     #preprocessing.augment.shear_images(dicoms[0],1)
     #ds.PixelData = dicoms[0].shears["pixel_array"][0]
     #ds.save_as(os.getcwd() + "/data/shear.dcm")

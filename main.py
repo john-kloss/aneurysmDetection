@@ -3,7 +3,7 @@ from __future__ import division
 from __future__ import print_function
 
 # Imports
-import nn
+from nn import training
 import input
 from preprocessing.createSubvolumes import create_subvolumes
 from preprocessing.augment import augmentation, create_masks, normalize_grayscale
@@ -21,25 +21,25 @@ if __name__ == "__main__":
     labs = None
     imgs = None
     hffile = None
-
+    """
     for file in os.listdir(os.getcwd() + "/data"):
         if ".dcm" in file:
             dicom = input.import_dicom(file)
             print("Processing Patient "+ str(count+1))
 
             dicom = create_masks(dicom)
-            dicom = augmentation(dicom)
+            dicom = augmentation(dicom,1)
             
             dicom.pixel_array = normalize_grayscale(dicom.pixel_array)
             dicom = create_subvolumes(dicom)
             
-            if count % 2 == 0:
-                labs, imgs, hffile = init_storage(dicom,count)
-            else:
-                write_dicoms(dicom, labs, imgs, hffile)
+            
+            init_storage(dicom,count)
+            
 
             count += 1 
         
-        
+    """ 
+    training.train_model()   
 
 #    nn.training.train_neural_network(data['train'], data['val'])
