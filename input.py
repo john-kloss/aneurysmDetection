@@ -5,11 +5,10 @@ import pydicom
 
 
 class Dicom:
-    def __init__(self, patient, aneurysm, pixel_array, slice_voxel_length):
+    def __init__(self, patient, aneurysm, pixel_array):
         self.patient = patient
         self.aneurysm = aneurysm
         self.pixel_array = pixel_array
-        self.slice_voxel_length = slice_voxel_length
         self.mask = None
         self.augmentations = None
     
@@ -72,10 +71,14 @@ aneurysm_coordinates = {
 def import_dicom(file):
     ds = pydicom.dcmread(os.getcwd() + "/data/" + file)
     file = file.replace(".dcm", "")     
-    slice_voxel_length = float(ds.SpacingBetweenSlices)/2+float(ds.SliceThickness)
+    
     
     #preprocessing.augment.shear_images(dicoms[0],1)
     #ds.PixelData = dicoms[0].shears["pixel_array"][0]
     #ds.save_as(os.getcwd() + "/data/shear.dcm")
-
-    return Dicom(file, aneurysm_coordinates[file], ds.pixel_array, slice_voxel_length)
+    if aneurysm_coordinates[file]:
+        ac = aneurysm_coordinates[file]
+    else:
+        ac = []
+    
+    return Dicom(file, ac , ds.pixel_array)

@@ -4,18 +4,12 @@ import numpy as np
 import tables
 import h5py
 
-    
-def write_dicoms(data, labs, imgs, file):
-
-    imgs.resize(imgs.shape[0] + len(data["images"]), axis= 0)
-    labs.resize(labs.shape[0] + len(data["labels"]), axis= 0)
-    labs[-len(data["labels"]):] = data["labels"]
-    imgs[-len(data["images"]):] = data["images"]
-    file.close()
+path = os.getcwd() + "/data/processed" 
 
 
-def init_storage(dat,i):
-    data = h5py.File('./data/processed/'+str(dat["patient"])+ '#' + str(i) + '#' +'.h5', 'w')
+def init_storage(dat):
+    patient_number = len(os.listdir(path))
+    data = h5py.File('./data/processed/'+str(dat["patient"])+ '#' + str(patient_number) + '#' +'.h5', 'w')
     images = data.create_group("images")
     labels = data.create_group("labels")
 
