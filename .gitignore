@@ -2,4 +2,4 @@ data
 __pycache__
 MNIST_data
 tmp
-.vscode 
+.vscode/*

@@ -5,6 +5,7 @@ from __future__ import print_function
 # Imports
 from nn import training
 import input
+import preprocessing
 from preprocessing.createSubvolumes import create_subvolumes
 from preprocessing.augment import augmentation, create_masks, normalize_grayscale
 from preprocessing.dataStorage import init_storage, write_dicoms
@@ -27,7 +28,7 @@ if __name__ == "__main__":
             print("Processing Patient "+ str(count+1))
 
             dicom = create_masks(dicom)
-
+            d = preprocessing.createTestSetSubvolumes.create_subvolumes(dicom)
             dicom = augmentation(dicom)
             
             dicom.pixel_array = normalize_grayscale(dicom.pixel_array)
