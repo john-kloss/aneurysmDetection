@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 
 
 
-SUBVOLUME_AMOUNT = 10
+SUBVOLUME_AMOUNT = 80
 SUBVOLUME_SIZE = 64
-ANEURYSM_COVERAGE = 0.95
+#ANEURYSM_COVERAGE = 0.95
 
 def create_subvolumes(dicom, slack = 3):
 

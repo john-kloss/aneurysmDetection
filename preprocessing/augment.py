@@ -9,6 +9,13 @@ import random
 import progressbar
 import matplotlib.pyplot as plt
 
+def visualize_mask(mask):
+    plt.imshow(mask[40])
+    plt.show()
+    plt.imshow(mask[62])
+    plt.show()
+    plt.imshow(mask[90])
+    plt.show()
 
 def normalize_grayscale(pixel_array):
     min = np.min(pixel_array)
@@ -26,8 +33,10 @@ def create_masks(dicom):
     for ac in dicom.aneurysm: 
         # make shape of sphere array odd so centroid is exactly one voxel
         size = int(ac[3])  # size equals radius b/c size given in mm, one voxel appr. 0,5 mm 
+        #z_size = int((ac[3]/2)/dicom.slice_voxel_length)
         shape = size*2+1 if size%2==0 else size*2
         aneurysm_sphere = mrt.geometry.sphere(shape,size)
+        #aneurysm_sphere = mrt.geometry.ellipsoid(shape, (size, size, z_size))
 
         # create mask by laying aneurysm sphere over dicom pixelarray 
         for x in range(shape):
@@ -35,10 +44,9 @@ def create_masks(dicom):
                 for z in range(shape):
                     # set all voxels containing aneurysm to 1 
                     if aneurysm_sphere[x][y][z]:
-                        mask[ac[0] - size + x][ac[1] - size + y][ac[2] - size + z] = 1
+                        mask[ac[0] - size + z][ac[1] - size + y][ac[2] - size + x] = 1
 
     dicom.mask = mask
-    
     return dicom
 
 

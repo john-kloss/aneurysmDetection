@@ -10,7 +10,7 @@ def dice_coefficient(y_true, y_pred, smooth=1.):
 
 
 def dice_coefficient_loss(y_true, y_pred):
-    return -dice_coefficient(y_true, y_pred)
+    return 1-dice_coefficient(y_true, y_pred)
 
 
 def weighted_dice_coefficient(y_true, y_pred, axis=(-3, -2, -1), smooth=0.00001):

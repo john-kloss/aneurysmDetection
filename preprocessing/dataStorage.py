@@ -15,7 +15,7 @@ def write_dicoms(data, labs, imgs, file):
 
 
 def init_storage(dat,i):
-    data = h5py.File('./data/tmp/dicom'+str(i)+'.h5', 'w')
+    data = h5py.File('./data/processed/dicom'+str(i)+'.h5', 'w')
     images = data.create_group("images")
     labels = data.create_group("labels")
 

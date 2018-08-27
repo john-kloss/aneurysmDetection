@@ -28,7 +28,8 @@ if __name__ == "__main__":
             print("Processing Patient "+ str(count+1))
 
             dicom = create_masks(dicom)
-            dicom = augmentation(dicom,1)
+
+            dicom = augmentation(dicom)
             
             dicom.pixel_array = normalize_grayscale(dicom.pixel_array)
             dicom = create_subvolumes(dicom)
@@ -38,8 +39,7 @@ if __name__ == "__main__":
             
 
             count += 1 
-        
-    """ 
+     """   
+    
     training.train_model()   
 
-#    nn.training.train_neural_network(data['train'], data['val'])

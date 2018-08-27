@@ -28,26 +28,30 @@ class DataGenerator(keras.utils.Sequence):
 
 """
 
-def data_gen(data,batch_size):
+def data_gen(patients,batch_size, epoch_steps):
     """
     Generator to yield inputs and their labels in batches.
     """
     
-    
     idx = 0
+
     while True:
-        if idx>39:
-            idx = 0 
-        X = np.empty((batch_size,1,64,64,64))
-        y = np.empty((batch_size,1,64,64,64))
-        for i in range(batch_size):
+        for pat in patients:
+            if idx>10:
+                idx = 0
+        
 
-            f = h5py.File(os.getcwd() + "/data/processed/new/dicom"+str(data)+".h5", 'r')
-            X[i,] = np.resize(f['images']['images'][idx], (1,64,64,64))
+            X = np.empty((batch_size,1,64,64,64))
+            y = np.empty((batch_size,1,64,64,64))
+            for i in range(batch_size):
 
-            y[i,] = np.resize(f['labels']['labels'][idx], (1,64,64,64))
-        print("processing sample "+str(idx))
-        idx += 1
-        yield X,y
+                f = h5py.File(os.getcwd() + "/data/processed/dicom"+str(pat)+".h5", 'r')
+                X[i,] = np.resize(f['images']['images'][idx+i], (1,64,64,64))
+
+                y[i,] = np.resize(f['labels']['labels'][idx+i], (1,64,64,64))
+            print(" processing sample "+str(idx))
+            
+            idx += 1
+            yield X,y
 
 
