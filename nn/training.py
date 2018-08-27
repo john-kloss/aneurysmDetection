@@ -5,7 +5,7 @@ from keras import backend as K
 import keras.callbacks 
 import numpy as np
 from keras.callbacks import LambdaCallback
-from .generator import data_gen 
+from .generator import DataGenerator 
 import tensorflow as tf
 import os
 from keras.callbacks import TensorBoard
@@ -19,23 +19,12 @@ def train_model(model=None, model_file=None, data=None, steps_per_epoch=1, valid
     
     
     net = unet_model_3d((1,64,64,64))
-    #net.load_weights("./data/tmp/logs/network_weights.h5")
-    training_data = data_gen([0,1,2,3],1,40)
-    validation_data = data_gen([4],1,10)
-    #history = LossHistory()
+    net.load_weights("./data/tmp/logs/network_weights.h5")
+    training_data = DataGenerator(1,[0])
+    validation_data = DataGenerator(1, [0])
     call= keras.callbacks.ModelCheckpoint("./data/tmp/logs/network_weights.h5", monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=True, mode='auto', period=1)
 
-    net.fit_generator(generator=training_data, steps_per_epoch=10*4, epochs=10, verbose=1, validation_data=validation_data, 
-    validation_steps=10, class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=False, shuffle=True, 
+    net.fit_generator(generator=training_data, steps_per_epoch=960*4, epochs=10, verbose=1, validation_data=validation_data, 
+    validation_steps=960, class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=True, shuffle=True, 
     initial_epoch=0, callbacks=[call])
     
-    net.save_weights("./data/tmp/logs/network_weights.h5")
-"""
-class LossHistory(keras.callbacks.Callback):
-    def on_train_begin(self, logs={}):
-        self.losses = []
-
-    def on_batch_end(self, batch, logs={}):
-        self.losses.append(logs.get('loss'))
-"""
-

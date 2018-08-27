@@ -21,7 +21,6 @@ if __name__ == "__main__":
     labs = None
     imgs = None
     hffile = None
-    """
     for file in os.listdir(os.getcwd() + "/data"):
         if ".dcm" in file:
             dicom = input.import_dicom(file)
@@ -39,7 +38,6 @@ if __name__ == "__main__":
             
 
             count += 1 
-     """   
     
     training.train_model()   
 

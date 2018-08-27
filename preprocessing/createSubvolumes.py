@@ -89,6 +89,7 @@ def create_subvolumes(dicom, slack = 3):
         )
 
     data = {
+        "patient": dicom.patient,
         "images": images, 
         "labels": labels
     }
