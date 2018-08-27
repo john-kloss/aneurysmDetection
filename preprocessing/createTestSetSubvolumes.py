@@ -5,7 +5,7 @@ import os
 import progressbar
 
 SUBVOLUME_SIZE = 64
-SUBVOLUME_OVERLAP = 0.5
+SUBVOLUME_OVERLAP = 0.1
 
 
 def create_subvolumes(dicom):
@@ -19,7 +19,7 @@ def create_subvolumes(dicom):
     stepsize = int(SUBVOLUME_SIZE * SUBVOLUME_OVERLAP)
     # initialize the progress bar
 
-
+    
     progressbar.printProgressBar(
         0, dim[2], prefix="Creating Testset subvolumes:", suffix="Complete", length=50
     )
@@ -54,11 +54,10 @@ def create_subvolumes(dicom):
 
 
     
-
-    # create the data object with train and test set
     data = {
         "images": images, 
-        "labels": labels
+        "labels": labels,
+        "patient": dicom.patient
     }
     return data
 
