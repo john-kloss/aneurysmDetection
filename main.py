@@ -14,7 +14,7 @@ import numpy as np
 import progressbar
 
 ACTIONS = ['augment', 'train', 'predict']
-ACTION = ACTIONS[0] # <- select action index
+ACTION = ACTIONS[1] # <- select action index
 
 if __name__ == "__main__":
     if ACTION == 'augment':
