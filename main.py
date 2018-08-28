@@ -17,7 +17,7 @@ ACTIONS = ['augment', 'create_testset', 'train', 'predict']
 ACTION = ACTIONS[1] # <- select action index
 
 if __name__ == "__main__":
-    if ACTION == 'augment' or 'create_testset':
+    if ACTION == 'augment' or ACTION == 'create_testset':
         # import the dicoms
         count = 0
         labs = None
@@ -33,14 +33,15 @@ if __name__ == "__main__":
                 dicom = augment.create_masks(dicom)
                 
                 if ACTION == 'create_testset':
-                    test_patches = testpp.create_subvolumes(dicom)
-                    init_storage(test_patches,test=True)
+                    # no augmentation step
+                    dicom.pixel_array = augment.normalize_grayscale(dicom.pixel_array)
+                    dicom = testpp.create_subvolumes(dicom)
+                    init_storage(dicom,test=True)
                 
                 else: 
                     dicom = augment.augmentation(dicom)  
                     dicom.pixel_array = augment.normalize_grayscale(dicom.pixel_array)
                     dicom = trainpp.create_subvolumes(dicom)
-                
                     init_storage(dicom)
                 
 
