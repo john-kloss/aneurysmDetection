@@ -15,17 +15,14 @@ def train_model(model=None, model_file=None, data=None, steps_per_epoch=1, valid
     
     
     net = unet_model_3d((1,64,64,64))
-    net.load_weights("./data/logs/network_weights.h5")
+    #net.load_weights("./data/logs/network_weights.h5")
 
-    training_data = DataGenerator([1,2,3,4,5,6,7,8,9])
-    validation_data = DataGenerator([10])
+    training_data = DataGenerator([0,1,2,3,4,5,6,7,8,9,10,11])
+    validation_data = DataGenerator([12,13])
     
-
-    # call = keras.callbacks.ModelCheckpoint("./data/logs/network_weights"+str(datetime.now())+".h5", monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=True, mode='auto', period=1)
-
-    net.fit_generator(generator=training_data, steps_per_epoch=None, epochs=25, verbose=1, validation_data=validation_data, 
-    validation_steps=None, class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=True, shuffle=True, 
+    net.fit_generator(generator=training_data, steps_per_epoch=None, epochs=20, verbose=1, validation_data=validation_data, 
+    validation_steps=None, class_weight=None, max_queue_size=10, workers=1, use_multiprocessing=True, shuffle=False, 
     initial_epoch=0, callbacks=None)
 
-    net.save_weights("./data/logs/network_weights.h5")
+    net.save_weights("./data/logs/network_weights_loss.h5")
 

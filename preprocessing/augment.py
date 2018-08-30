@@ -10,11 +10,11 @@ import progressbar
 import matplotlib.pyplot as plt
 
 def visualize_mask(mask):
-    plt.imshow(mask[40])
+    plt.imshow(mask[78])
     plt.show()
     plt.imshow(mask[62])
     plt.show()
-    plt.imshow(mask[90])
+    plt.imshow(mask[80])
     plt.show()
 
 def normalize_grayscale(pixel_array):

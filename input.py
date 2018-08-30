@@ -22,7 +22,6 @@ aneurysm_coordinates = {
     "Patient_14_MRA": [[78, 152, 178, 25.4]],
     "Patient_15_MRA": [[265, 65, 218, 16.2]],
     "Patient_16_MRA": [[273, 42, 176, 6.4], [259, 45, 272, 5.5]],
-    "Patient_C121_CE-MRA": [],
     "Patient_21_TOF-MRA": [[64, 143, 159, 18.5]],
     "Patient_105_MRA": [[211, 93, 239, 24]],
     "Patient_C37_MRA": [[142, 132, 183, 10.8]],
@@ -57,13 +56,8 @@ aneurysm_coordinates = {
     "Patient_C64_TOF-MRA": [[91, 166, 233, 4.7]],
     # transformed images
     "Patient_C38_MRA": [[51, 98, 212, 6.4]],
-    "Patient_C42_MRA": [[]],
-    "Patient_C46_MRA": [[]],
-    "Patient_C55_MRA": [[]],
-    "Patient_C69_MRA": [[]],
     "Patient_C87_CE-MRA": [[97, 168, 248, 5.4]],
     "Patient_C96_CE-MRA": [[179, 79, 153, 14.5]],
-    "Patient_C101_CE-MRA": [[]],
     "Patient_C127_TOF-MRA": [[197, 85, 249, 5.5], [203, 112, 203, 4.5]],
 }
 
@@ -76,7 +70,7 @@ def import_dicom(file):
     #preprocessing.augment.shear_images(dicoms[0],1)
     #ds.PixelData = dicoms[0].shears["pixel_array"][0]
     #ds.save_as(os.getcwd() + "/data/shear.dcm")
-    if aneurysm_coordinates[file]:
+    if file in aneurysm_coordinates.keys():
         ac = aneurysm_coordinates[file]
     else:
         ac = []

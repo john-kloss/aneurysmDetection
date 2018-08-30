@@ -3,8 +3,8 @@ from keras import backend as K
 from keras.engine import Input, Model
 from keras.layers import Conv3D, MaxPooling3D, UpSampling3D, Activation, BatchNormalization, PReLU, Deconvolution3D
 from keras.optimizers import Adam
-
-from .metrics import dice_coefficient_loss, dice_coefficient
+from keras import metrics 
+from .metrics import dice_coefficient_loss, dice_coefficient, create_weighted_binary_crossentropy
 
 K.set_image_data_format("channels_first")
 
@@ -70,7 +70,7 @@ def unet_model_3d(input_shape, pool_size=(4,4,4), n_labels=1, initial_learning_r
     model = Model(inputs=inputs, outputs=act)
 
 
-    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=dice_coefficient_loss, metrics=[metrics])
+    model.compile(optimizer=Adam(lr=initial_learning_rate), loss=create_weighted_binary_crossentropy(0.05,0.95), metrics=['binary_crossentropy', dice_coefficient], sample_weight_mode='temporal')
     return model
 
 

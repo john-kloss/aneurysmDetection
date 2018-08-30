@@ -13,8 +13,9 @@ import os
 import numpy as np
 import progressbar
 
+#               0              1           2         3
 ACTIONS = ['augment', 'create_testset', 'train', 'predict']
-ACTION = ACTIONS[1] # <- select action index
+ACTION = ACTIONS[2] # <- select action index
 
 if __name__ == "__main__":
     if ACTION == 'augment' or ACTION == 'create_testset':
@@ -23,7 +24,7 @@ if __name__ == "__main__":
         labs = None
         imgs = None
         hffile = None
-        for file in os.listdir(os.getcwd() + "/data"):
+        for file in os.listdir(os.getcwd() + "/data/"):
             if ".dcm" in file:
                 dicom = input.import_dicom(file)
                 if len(dicom.aneurysm) == 0:
