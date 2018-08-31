@@ -4,7 +4,7 @@ import numpy as np
 import keras
 
 import re
-path = os.getcwd() + "/data/processed/processed_range20" 
+path = os.getcwd() + "/data/processed" 
 AMOUNT_SUBVOLUMES = 880
 
 class DataGenerator(keras.utils.Sequence):

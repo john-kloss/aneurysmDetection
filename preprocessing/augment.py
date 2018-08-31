@@ -10,12 +10,11 @@ import progressbar
 import matplotlib.pyplot as plt
 
 def visualize_mask(mask):
-    plt.imshow(mask[78])
+    plt.imshow(mask[118])
     plt.show()
-    plt.imshow(mask[62])
+    plt.imshow(mask[120])
     plt.show()
-    plt.imshow(mask[80])
-    plt.show()
+
 
 def normalize_grayscale(pixel_array):
     min = np.min(pixel_array)
@@ -47,9 +46,9 @@ def create_masks(dicom):
                         mask[ac[0] - size + z][ac[1] - size + y][ac[2] - size + x] = 1
 
     dicom.mask = mask
+   # visualize_mask(mask)
+    #visualize_mask(dicom.pixel_array)
     return dicom
-
-
 
 
 def rotate_images(pixel_array, mask):

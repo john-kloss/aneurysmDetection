@@ -6,7 +6,7 @@ import h5py
 
 
 def init_storage(dat, test=False):
-    path = os.getcwd() + "/data/processed/processed_range20/" 
+    path = os.getcwd() + "/data/processed/" 
 
     if test:
         path = os.getcwd() + "/data/processed/test/" 

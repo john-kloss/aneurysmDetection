@@ -15,7 +15,7 @@ import progressbar
 
 #               0              1           2         3
 ACTIONS = ['augment', 'create_testset', 'train', 'predict']
-ACTION = ACTIONS[2] # <- select action index
+ACTION = ACTIONS[3] # <- select action index
 
 if __name__ == "__main__":
     if ACTION == 'augment' or ACTION == 'create_testset':
