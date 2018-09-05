@@ -5,8 +5,11 @@ import h5py
 from .model import unet_model_3d
 from .generator import DataGenerator
 from .metrics import dice_coefficient
+from sklearn.metrics import log_loss
 from scipy.spatial import distance
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
 
 def visualize_mask(mask):
     plt.imshow(mask[0])
@@ -15,6 +18,41 @@ def visualize_mask(mask):
     plt.show()
     plt.imshow(mask[40])
     plt.show()
+
+
+def plot(prediction, labels):
+    aneurysm_pred = np.where(prediction[0][0] > 0.5)
+    fig = plt.figure()
+    ax = fig.add_subplot(121, projection="3d")
+    ax.set_xlim([0, 64])
+    ax.set_ylim([0, 64])
+    ax.set_zlim([0, 64])
+    ax.scatter(
+        aneurysm_pred[0],
+        aneurysm_pred[1],
+        aneurysm_pred[2],
+        zdir="z",
+        c="red",
+        alpha=0.5,
+        marker=".",
+    )
+
+    aneurysm_pred = np.where(labels[0][0] > 0.5)
+    ax = fig.add_subplot(122, projection="3d")
+    ax.set_xlim([0, 64])
+    ax.set_ylim([0, 64])
+    ax.set_zlim([0, 64])
+    ax.scatter(
+        aneurysm_pred[0],
+        aneurysm_pred[1],
+        aneurysm_pred[2],
+        zdir="z",
+        c="red",
+        alpha=0.5,
+        marker=".",
+    )
+    plt.show()
+
 
 path = os.getcwd() + "/data/processed/test/"
 
@@ -38,15 +76,19 @@ def predict():
         for i in range(amount_of_subvolumes):
             images = np.array(np.reshape(f["images/images"][i], (1, 1, 64, 64, 64)))
             labels = np.array(np.reshape(f["labels/labels"][i], (1, 1, 64, 64, 64)))
+            # if len(np.nonzero(labels)[1]) == 0:
+            # continue
             prediction = net.predict(images, batch_size=1, verbose=1)
 
             highly_conf_predicted = len(np.where(prediction[0][0] > 0.99)[0])
+            # plot(prediction, labels)
 
             # aneurysm in mask -> dice can be considered as measure
             if len(np.nonzero(labels)[1]) != 0:
                 dc = 1 - distance.dice(
                     np.reshape(labels, (-1,)), np.reshape(prediction, (-1,))
                 )
+
                 if dc > 0.30:
                     # aneurysm detected correctly
                     tp += 1
