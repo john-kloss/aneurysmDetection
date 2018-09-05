@@ -2,6 +2,8 @@
 import os
 import preprocessing.augment
 import pydicom
+import matplotlib.pyplot as plt
+
 
 
 class Dicom:
@@ -108,12 +110,23 @@ def import_dicom(file):
     file = file.replace(".dcm", "")     
     
     
-    #preprocessing.augment.shear_images(dicoms[0],1)
-    #ds.PixelData = dicoms[0].shears["pixel_array"][0]
-    #ds.save_as(os.getcwd() + "/data/shear.dcm")
+    #shear = preprocessing.augment.normalize_grayscale(ds.pixel_array)
+    #visualize_mask(shear)
+    #ds.PixelData = shear
+    #ds.save_as(os.getcwd() + "/data/normalized.dcm")
+
     if file in aneurysm_coordinates.keys():
         ac = aneurysm_coordinates[file]
     else:
         ac = []
     
     return Dicom(file, ac , ds.pixel_array)
+
+
+def visualize_mask(mask):
+    plt.imshow(mask[100],cmap='Greys')
+    plt.show()
+    plt.imshow(mask[20])
+    plt.show()
+    plt.imshow(mask[40])
+    plt.show()

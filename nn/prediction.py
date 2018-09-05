@@ -26,6 +26,8 @@ def predict():
     global_fp = 0
     
     for patient in os.listdir(path):
+        if not ".h" in patient:
+            continue
 
         f = h5py.File( path + patient , 'r')    
         amount_of_subvolumes = len(f['images/images'])

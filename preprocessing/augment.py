@@ -10,7 +10,7 @@ import progressbar
 import matplotlib.pyplot as plt
 
 def visualize_mask(mask):
-    plt.imshow(mask[118])
+    plt.imshow(mask[142], cmap='Greys')
     plt.show()
     plt.imshow(mask[120])
     plt.show()
@@ -46,8 +46,8 @@ def create_masks(dicom):
                         mask[ac[0] - size + z][ac[1] - size + y][ac[2] - size + x] = 1
 
     dicom.mask = mask
-   # visualize_mask(mask)
-    #visualize_mask(dicom.pixel_array)
+    visualize_mask(mask)
+    visualize_mask(dicom.pixel_array)
     return dicom
 
 

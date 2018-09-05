@@ -16,7 +16,6 @@ def train_model(model=None, model_file=None, data=None, steps_per_epoch=1, valid
     
     net = unet_model_3d((1,64,64,64))
     net.load_weights("./data/logs/network_weights_loss.h5")
-
     training_data = DataGenerator([0,1,2,3,4])
     validation_data = DataGenerator([10])
     
