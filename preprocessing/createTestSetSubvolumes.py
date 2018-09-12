@@ -16,7 +16,7 @@ def create_subvolumes(dicom):
 
     images = []
     labels = []
-
+    cuts = []
 
     dim = dicom.pixel_array.shape
     # calculate the stepsize
@@ -62,6 +62,7 @@ def create_subvolumes(dicom):
                     z : z + SUBVOLUME_SIZE,
                 ]
 
+                cuts.append([x+32,y+32,z+32])
                 images.append(subvolume)
                 labels.append(label)
 
@@ -79,7 +80,9 @@ def create_subvolumes(dicom):
     data = {
         "images": images, 
         "labels": labels,
-        "patient": dicom.patient
+        "patient": dicom.patient,
+        "coordinates": cuts,
+        "pixel_array": dicom.pixel_array
     }
     return data
 

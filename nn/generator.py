@@ -5,7 +5,8 @@ import keras
 
 import re
 path = os.getcwd() + "/data/processed" 
-AMOUNT_SUBVOLUMES = 880
+AMOUNT_SUBVOLUMES = 220
+shape = 64
 
 class DataGenerator(keras.utils.Sequence):
 

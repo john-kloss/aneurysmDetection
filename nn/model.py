@@ -3,6 +3,7 @@ from keras import backend as K
 from keras.engine import Input, Model
 from keras.layers import Conv3D, MaxPooling3D, UpSampling3D, Activation, BatchNormalization, PReLU, Deconvolution3D
 from keras.optimizers import Adam
+from keras.initializers import RandomNormal
 from keras import metrics 
 from .metrics import dice_coefficient_loss, dice_coefficient, create_weighted_binary_crossentropy
 
@@ -69,12 +70,11 @@ def unet_model_3d(input_shape, pool_size=(4,4,4), n_labels=1, initial_learning_r
     act = Activation(activation_name)(final_convolution)
     model = Model(inputs=inputs, outputs=act)
 
-
     model.compile(optimizer=Adam(lr=initial_learning_rate), loss=create_weighted_binary_crossentropy(0.05,0.95), metrics=['binary_crossentropy', dice_coefficient], sample_weight_mode='temporal')
     return model
 
 
-def create_convolution_block(input_layer, n_filters, batch_normalization=False, kernel=(3, 3, 3), activation=None,
+def create_convolution_block(input_layer, n_filters, batch_normalization=False, kernel=(3,3,3), activation=None,
                              padding='same', strides=(1, 1, 1), instance_normalization=False):
     """
     :param strides:
@@ -86,7 +86,8 @@ def create_convolution_block(input_layer, n_filters, batch_normalization=False, 
     :param padding:
     :return:
     """
-    layer = Conv3D(n_filters, kernel, padding=padding, strides=strides)(input_layer)
+    init = RandomNormal(mean=0.0, stddev=0.05, seed=None)
+    layer = Conv3D(n_filters, kernel, padding=padding, strides=strides, bias_initializer=init)(input_layer)
     if batch_normalization:
         layer = BatchNormalization(axis=1)(layer)
     elif instance_normalization:

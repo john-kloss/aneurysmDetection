@@ -12,10 +12,11 @@ from preprocessing.dataStorage import init_storage
 import os
 import numpy as np
 import progressbar
+import matplotlib.pyplot as plt
 
-#               0              1           2         3
+#               0              1           2         3          
 ACTIONS = ['augment', 'create_testset', 'train', 'predict']
-ACTION = ACTIONS[0] # <- select action index
+ACTION = ACTIONS[3] # <- select action index
 
 if __name__ == "__main__":
     if ACTION == 'augment' or ACTION == 'create_testset':
@@ -32,7 +33,7 @@ if __name__ == "__main__":
                 print("Processing Patient "+ str(count+1))
 
                 dicom = augment.create_masks(dicom)
-                
+
                 if ACTION == 'create_testset':
                     # no augmentation step
                     dicom.pixel_array = augment.normalize_grayscale(dicom.pixel_array)
@@ -40,7 +41,7 @@ if __name__ == "__main__":
                     init_storage(dicom,test=True)
                 
                 else: 
-                    dicom = augment.augmentation(dicom)  
+                    dicom = augment.augmentation(dicom,9)  
                     dicom.pixel_array = augment.normalize_grayscale(dicom.pixel_array)
                     dicom = trainpp.create_subvolumes(dicom)
                     init_storage(dicom)
@@ -52,7 +53,7 @@ if __name__ == "__main__":
         training.train_model()  
 
     elif ACTION == 'predict':
-        evals = prediction.predict()
+        prediction.predict()
 
     else:
         raise Exception('Unknown action')

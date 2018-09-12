@@ -8,12 +8,12 @@ import matplotlib.pyplot as plt
 
 
 
-SUBVOLUME_AMOUNT = 80
+SUBVOLUME_AMOUNT = 15
 SUBVOLUME_SIZE = 64
 
 #ANEURYSM_COVERAGE = 0.95
 
-def create_subvolumes(dicom, slack = 3):
+def create_subvolumes(dicom, slack = 6):
 
     images = []
     labels = []
@@ -45,7 +45,7 @@ def create_subvolumes(dicom, slack = 3):
                             
                 # draw random numbers from normal distribution for each dimension around aneurysm coordinate
                 # augmentations changed only slightly so aneurysm should still be in this range
-                sig = 20
+                sig = 5
                 sv_centroid = [
                     int (stats.truncnorm.rvs( 
                         a = (sv - dicom.aneurysm[num_aneurysm][coords]) / sig , 

@@ -9,11 +9,6 @@ import random
 import progressbar
 import matplotlib.pyplot as plt
 
-def visualize_mask(mask):
-    plt.imshow(mask[142], cmap='Greys')
-    plt.show()
-    plt.imshow(mask[120])
-    plt.show()
 
 
 def normalize_grayscale(pixel_array):
@@ -23,6 +18,36 @@ def normalize_grayscale(pixel_array):
     
     return normalized_array
 
+def plot(prediction, labels):
+    dims = prediction.shape
+    aneurysm_pred = np.where(prediction > 0.5)
+    label = np.where(labels > 0.5)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(121, projection="3d")
+    ax.set_xlim([0, dims[0]])
+    ax.set_ylim([0, dims[1]])
+    ax.set_zlim([0, dims[2]])
+    ax.scatter(
+        aneurysm_pred[0],
+        aneurysm_pred[1],
+        aneurysm_pred[2],
+        zdir="z",
+        c="red",
+        alpha=0.5,
+        marker=".",
+    )  
+
+    ax.scatter(
+        label[0],
+        label[1],
+        label[2],
+        zdir="z",
+        c="red",
+        alpha=0.5,
+        marker=".",
+    )
+    plt.savefig("fig.jpg") 
 
 def create_masks(dicom):
 
@@ -32,10 +57,8 @@ def create_masks(dicom):
     for ac in dicom.aneurysm: 
         # make shape of sphere array odd so centroid is exactly one voxel
         size = int(ac[3])  # size equals radius b/c size given in mm, one voxel appr. 0,5 mm 
-        #z_size = int((ac[3]/2)/dicom.slice_voxel_length)
         shape = size*2+1 if size%2==0 else size*2
         aneurysm_sphere = mrt.geometry.sphere(shape,size)
-        #aneurysm_sphere = mrt.geometry.ellipsoid(shape, (size, size, z_size))
 
         # create mask by laying aneurysm sphere over dicom pixelarray 
         for x in range(shape):
@@ -46,8 +69,7 @@ def create_masks(dicom):
                         mask[ac[0] - size + z][ac[1] - size + y][ac[2] - size + x] = 1
 
     dicom.mask = mask
-    visualize_mask(mask)
-    visualize_mask(dicom.pixel_array)
+    #plot(dicom.pixel_array, mask)   
     return dicom
 
 
