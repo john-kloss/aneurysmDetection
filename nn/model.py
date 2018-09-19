@@ -5,6 +5,7 @@ from keras.layers import Conv3D, MaxPooling3D, UpSampling3D, Activation, BatchNo
 from keras.optimizers import Adam
 from keras.initializers import RandomNormal
 from keras import metrics 
+from keras import regularizers
 from .metrics import dice_coefficient_loss, dice_coefficient, create_weighted_binary_crossentropy
 
 K.set_image_data_format("channels_first")
@@ -87,7 +88,7 @@ def create_convolution_block(input_layer, n_filters, batch_normalization=False, 
     :return:
     """
     init = RandomNormal(mean=0.0, stddev=0.05, seed=None)
-    layer = Conv3D(n_filters, kernel, padding=padding, strides=strides, bias_initializer=init)(input_layer)
+    layer = Conv3D(n_filters, kernel, padding=padding, strides=strides, bias_initializer=init ,kernel_regularizer=regularizers.l2(0.01))(input_layer)
     if batch_normalization:
         layer = BatchNormalization(axis=1)(layer)
     elif instance_normalization:

@@ -25,7 +25,7 @@ if __name__ == "__main__":
         labs = None
         imgs = None
         hffile = None
-        for file in os.listdir(os.getcwd() + "/data/"):
+        for file in os.listdir(os.getcwd() + "/data/test_dicoms"):
             if ".dcm" in file:
                 dicom = input.import_dicom(file)
                 if len(dicom.aneurysm) == 0:

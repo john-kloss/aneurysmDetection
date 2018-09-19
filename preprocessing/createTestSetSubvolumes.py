@@ -6,7 +6,7 @@ import progressbar
 
 SUBVOLUME_SIZE = 64
 SUBVOLUME_OVERLAP = 1
-IMAGE_CENTER = 0.8
+IMAGE_CENTER = 0.5
 
 
 def create_subvolumes(dicom):

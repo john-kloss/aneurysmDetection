@@ -48,45 +48,49 @@ aneurysm_coordinates = {
     "Patient_C113_CE-MRA": [[262, 59, 218, 3.9], [269, 55, 135, 2.6]],
     "Patient_C113_CE-MRA_new": [[182, 58, 192, 3.9], [192, 55, 110, 2.6]],
     "Patient_C120_CE-MRA": [[253, 51, 223, 9.1]],
-    "Patient_C120_TOF-MRA": [[124, 143, 188, 9.1]],
+   # "Patient_C120_TOF-MRA": [[124, 143, 188, 9.1]],
     "Patient_C121_CE-MRA_new": [[196, 57, 167, 5.7]],
     "Patient_C121_TOF-MRA": [[75, 152, 198, 5.7]],
     "Patient_C138_CE-MRA": [[260, 51, 218, 5.4]],
-    "Patient_C138_TOF-MRA": [[102, 150, 196, 5.4]],
+   # "Patient_C138_TOF-MRA": [[102, 150, 196, 5.4]],
     "Patient_C144_CE-MRA": [[214, 90, 207, 6.8]],
     "Patient_C144_TOF-MRA": [[104, 181, 181, 6.8]],
     "Patient_C64_TOF-MRA": [[91, 166, 233, 4.7]],
     # transformed images
-    "Patient_C38_MRA": [[51, 98, 212, 6.4]],
+    #"Patient_C38_MRA": [[51, 98, 212, 6.4]],
     "Patient_C87_CE-MRA": [[97, 168, 248, 5.4]],
     "Patient_C96_CE-MRA": [[179, 79, 153, 14.5]],
-    "Patient_C127_TOF-MRA": [[197, 85, 249, 5.5], [203, 112, 203, 4.5]],
+    #"Patient_C127_TOF-MRA": [[197, 85, 249, 5.5], [203, 112, 203, 4.5]],
 
 
 }
 
-
+import numpy as np
 def import_dicom(file):
-    ds = pydicom.dcmread(os.getcwd() + "/data/" + file)
+    ds = pydicom.dcmread(os.getcwd() + "/data/test_dicoms/" + file)
     file = file.replace(".dcm", "")     
     
 
-
-    #ds.PixelData = shear
-    #ds.save_as(os.getcwd() + "/data/normalized.dcm")
+   
 
     if file in aneurysm_coordinates.keys():
         ac = aneurysm_coordinates[file]
     else:
         ac = []
-    
+    d = Dicom(file, ac , ds.pixel_array)
+    """
+    dicom = preprocessing.augment.create_masks(d)
+    dims= dicom.mask.shape
+    dicom.pixel_array.setflags(write=1)
+    highest_val = np.max(dicom.pixel_array)
+    for x in range(dims[0]):
+                for y in range(dims[1]):
+                    for z in range(dims[2]):
+                        if dicom.mask[x][y][z] == 1: 
+                                dicom.pixel_array[x][y][z] = highest_val
+
+    ds.PixelData = dicom.pixel_array
+    ds.save_as(os.getcwd() + "/data/normalized.dcm")
+    """
+
     return Dicom(file, ac , ds.pixel_array)
-
-
-def visualize_mask(mask):
-    plt.imshow(mask[100],cmap='Greys')
-    plt.show()
-    plt.imshow(mask[20])
-    plt.show()
-    plt.imshow(mask[40])
-    plt.show()

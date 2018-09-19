@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import pickle
 
-history = pickle.load(open("./data/logs/trainHistoryDict_depth", "rb"))
+history = pickle.load(open("./data/logs/trainHistoryDict_dice_2", "rb"))
 weights = pickle.load(open("./data/logs/trainHistoryDict_lowWeightsRandom", "rb"))
 plt.plot(history['binary_crossentropy'])
 plt.plot(history['val_binary_crossentropy'])
-plt.title('binary crossentropy')
+plt.title('weights initialized as zero: cross-entropy')
 plt.ylabel('binary_crossentropy')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
@@ -24,7 +24,7 @@ plt.show()
 
 plt.plot(weights['binary_crossentropy'])
 plt.plot(weights['val_binary_crossentropy'])
-plt.title('weights randomly initialized: Cross-entropy')
+plt.title('weights randomly initialized: cross-entropy')
 plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'validation'], loc='upper left')
